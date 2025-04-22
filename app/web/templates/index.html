@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JD Generator</title>
+
+  <!-- ✨ Inline CSS for layout, form, and animation -->
+  <style>
+    /* Layout and base styles */
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      line-height: 1.6;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.75rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      font-size: 1rem;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
+
+    .controls {
+      margin-top: 1rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    button[type="button"] {
+      background-color: #f44336;
+      color: white;
+    }
+
+    /* Output container */
+    .output {
+      background: #f7f7f7;
+      padding: 1rem;
+      margin-top: 2rem;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+
+    /* Spinner animation (blinking dots) */
+    .dots .dot {
+      animation: blink 1.5s infinite;
+      opacity: 0;
+    }
+
+    .dots .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dots .dot:nth-child(3) { animation-delay: 0.4s; }
+    .dots .dot:nth-child(4) { animation-delay: 0.6s; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+  </style>
+
+  <!-- Client-side JS: show spinner and reset UI -->
+  <script>
+    function showSpinner() {
+      document.getElementById('spinner').style.display = 'inline';
+    }
+
+    function resetForm() {
+      document.getElementById('prompt').value = '';
+      document.getElementById('response-container').innerHTML = '';
+    }
+  </script>
+</head>
+
+<body>
+  <h1>🧠 JD Generator</h1>
+
+  <!-- Prompt Form -->
+  <form method="post" action="/generate" onsubmit="showSpinner()">
+    <!-- User input prompt -->
+    <textarea name="prompt" id="prompt" placeholder="Enter your job requirement...">{{ prompt or '' }}</textarea>
+
+    <!-- Buttons and spinner indicator -->
+    <div class="controls">
+      <button type="submit">Generate JD</button>
+      <button type="button" onclick="resetForm()">Reset</button>
+
+      <!-- Spinner with animated dots -->
+      <span id="spinner" class="dots" style="display: none;">
+        ⏳ Generating<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+      </span>
+    </div>
+  </form>
+
+  <!-- Output Section: Rendered Markdown and Download -->
+  {% if jd_html %}
+  <div class="output" id="response-container">
+    <!-- Rendered HTML from Markdown response -->
+    {{ jd_html | safe }}
+
+    <!-- Hidden form to allow markdown download -->
+    <br><br>
+    <form method="post" action="/download">
+      <input type="hidden" name="markdown" value="{{ jd_markdown }}">
+      <button type="submit">💾 Download .md</button>
+    </form>
+  </div>
+  {% endif %}
+</body>
+</html>
